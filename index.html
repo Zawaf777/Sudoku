@@ -88,24 +88,9 @@
     <button class="num-btn" onclick="selectNumber(6)">6</button>
   </div>
   <button class="new-game" onclick="checkWin()">Check Answer</button>
-  <button class="new-game" onclick="location.reload()">New Game</button>
+  <button class="new-game" onclick="location.reload()">Reset</button>
 
   <script>
-    function generatePuzzle(solution, clues = 18) {
-      const puzzle = JSON.parse(JSON.stringify(solution));
-      let removed = 36 - clues;
-      while (removed > 0) {
-        const r = Math.floor(Math.random() * 6);
-        const c = Math.floor(Math.random() * 6);
-        if (puzzle[r][c] !== 0) {
-          puzzle[r][c] = 0;
-          removed--;
-        }
-      }
-      console.log("Generated Puzzle:", puzzle); // Debugging the puzzle generation
-      return puzzle;
-    }
-
     const solution = [
       [6, 2, 1, 3, 5, 4],
       [5, 4, 3, 2, 1, 6],
@@ -115,8 +100,16 @@
       [1, 6, 5, 4, 3, 2]
     ];
 
-    const initialPuzzle = generatePuzzle(solution);
-    console.log("Initial Puzzle:", initialPuzzle); // Debugging puzzle creation
+    // Predefined puzzle with empty spots (0) in some places, matching the solution
+    const initialPuzzle = [
+      [6, 0, 0, 3, 0, 4],
+      [0, 4, 3, 0, 1, 0],
+      [0, 0, 4, 6, 0, 5],
+      [0, 3, 0, 5, 0, 0],
+      [3, 0, 2, 0, 6, 0],
+      [1, 0, 5, 4, 0, 2]
+    ];
+
     const board = document.getElementById('board');
     let selectedNumber = null;
     let selectedCell = null;
@@ -173,7 +166,7 @@
       });
 
       if (allCorrect) {
-        alert("🎉 Congratulations! You solved the Sudoku! Here is your clue: 'Under the oak lies the code.'");
+        alert("🎉 Congratulations! You solved the Sudoku! Here is your clue: 'TEAM UNITEDDD.'");
       } else {
         alert("❌ Not quite right. Try again!");
       }
