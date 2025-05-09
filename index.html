@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Solve for the next clue</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f8f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(6, 50px);
+      grid-template-rows: repeat(6, 50px);
+      gap: 2px;
+      border: 3px solid black;
+      background-color: white;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    .cell {
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      font-size: 18px;
+      border: 1px solid #ddd;
+      background-color: #f1f2f3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .fixed {
+      background-color: white;
+      font-weight: bold;
+      cursor: default;
+    }
+    .selected {
+      outline: 2px solid #333;
+    }
+    .number-pad {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .num-btn {
+      width: 40px;
+      height: 40px;
+      background-color: black;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .new-game {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: black;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Solve for the next clue</h1>
+  <div id="board" class="board"></div>
+  <div class="number-pad">
+    <button class="num-btn" onclick="selectNumber(1)">1</button>
+    <button class="num-btn" onclick="selectNumber(2)">2</button>
+    <button class="num-btn" onclick="selectNumber(3)">3</button>
+    <button class="num-btn" onclick="selectNumber(4)">4</button>
+    <button class="num-btn" onclick="selectNumber(5)">5</button>
+    <button class="num-btn" onclick="selectNumber(6)">6</button>
+  </div>
+  <button class="new-game" onclick="checkWin()">Check Answer</button>
+  <button class="new-game" onclick="location.reload()">New Game</button>
+
+  <script>
+    function generatePuzzle(solution, clues = 18) {
+      const puzzle = JSON.parse(JSON.stringify(solution));
+      let removed = 36 - clues;
+      while (removed > 0) {
+        const r = Math.floor(Math.random() * 6);
+        const c = Math.floor(Math.random() * 6);
+        if (puzzle[r][c] !== 0) {
+          puzzle[r][c] = 0;
+          removed--;
+        }
+      }
+      console.log("Generated Puzzle:", puzzle); // Debugging the puzzle generation
+      return puzzle;
+    }
+
+    const solution = [
+      [6, 2, 1, 3, 5, 4],
+      [5, 4, 3, 2, 1, 6],
+      [2, 1, 4, 6, 3, 5],
+      [4, 3, 6, 5, 2, 1],
+      [3, 5, 2, 1, 6, 4],
+      [1, 6, 5, 4, 3, 2]
+    ];
+
+    const initialPuzzle = generatePuzzle(solution);
+    console.log("Initial Puzzle:", initialPuzzle); // Debugging puzzle creation
+    const board = document.getElementById('board');
+    let selectedNumber = null;
+    let selectedCell = null;
+
+    function selectNumber(num) {
+      selectedNumber = num;
+    }
+
+    function createBoard() {
+      for (let row = 0; row < 6; row++) {
+        for (let col = 0; col < 6; col++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+
+          if (initialPuzzle[row][col] !== 0) {
+            cell.textContent = initialPuzzle[row][col];
+            cell.classList.add('fixed');
+          } else {
+            cell.dataset.row = row;
+            cell.dataset.col = col;
+            cell.addEventListener('click', () => {
+              if (selectedCell) selectedCell.classList.remove('selected');
+              selectedCell = cell;
+              cell.classList.add('selected');
+
+              if (selectedNumber !== null) {
+                cell.textContent = selectedNumber;
+                selectedNumber = null;
+                cell.classList.remove('selected');
+                selectedCell = null;
+              }
+            });
+          }
+
+          board.appendChild(cell);
+        }
+      }
+    }
+
+    function checkWin() {
+      const cells = document.querySelectorAll('.cell');
+      let allCorrect = true;
+
+      cells.forEach(cell => {
+        const row = cell.dataset.row;
+        const col = cell.dataset.col;
+
+        if (row !== undefined && col !== undefined) {
+          const val = parseInt(cell.textContent);
+          if (val !== solution[parseInt(row)][parseInt(col)]) {
+            allCorrect = false;
+          }
+        }
+      });
+
+      if (allCorrect) {
+        alert("🎉 Congratulations! You solved the Sudoku! Here is your clue: 'Under the oak lies the code.'");
+      } else {
+        alert("❌ Not quite right. Try again!");
+      }
+    }
+
+    createBoard();
+  </script>
+</body>
+</html>
